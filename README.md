@@ -31,8 +31,8 @@ To start the demo, go to the folder `ver0`, compile and run the test.
 
 ### Intial version: ver0
 The typical output of the simulation is:
-
- Run the default test case on CPU: 
+```
+Run the default test case on CPU: 
  ./nbody.x 
  ===============================
   Initialize Gravity Simulation
@@ -54,6 +54,7 @@ The typical output of the simulation is:
  # Number Threads     : 1
  # Total Time (s)     : 14.466
  # Average Perfomance : 4.0513 +- 0.11807
+```
 
 On output is printed with some useful information. Colomnwise: s is the
 number of steps; dt is the physical time taking into account the physical
@@ -182,3 +183,5 @@ openmp scheduling and threads affinity.
 
 ### ver8
 This is the version of the code with OpenMP and cache tiling.
+One can also play with the floating point model -fp-model fast=2, for example and
+look for further performance improvements
