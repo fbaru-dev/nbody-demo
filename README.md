@@ -56,7 +56,7 @@ Run the default test case on CPU:
  # Average Perfomance : 4.0513 +- 0.11807
 ```
 
-On output is printed with some useful information. Colomnwise: s is the
+On output is printed some useful information. Colomnwise: s is the
 number of steps; dt is the physical time taking into account the physical
 time integration step; kenery is the kinetic energy of the group of particles;
 time is the computational time taken till that time step; GFlops is the
