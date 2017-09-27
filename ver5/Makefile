@@ -1,5 +1,5 @@
 CXX = icpc
-COMPFLAGS = -std=c++11 -O2 
+COMPFLAGS = -g -std=c++11 -O2 
 #-DASALIGN 
 OPTFLAGS = -xAVX2
 OMPFLAGS = -qopenmp-simd

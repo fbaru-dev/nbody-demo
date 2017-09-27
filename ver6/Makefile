@@ -1,5 +1,5 @@
 CXX = icpc
-COMPFLAGS = -std=c++11 -O2   
+COMPFLAGS = -g -std=c++11 -O2   
 OPTFLAGS = -xAVX2
 OMPFLAGS = -qopenmp-simd
 REPFLAGS = -qopt-report=5 -qopt-report-filter="GSimulation.cpp,130-220" 
