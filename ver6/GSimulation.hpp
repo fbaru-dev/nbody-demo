@@ -21,6 +21,7 @@
 #ifndef _GSIMULATION_HPP
 #define _GSIMULATION_HPP
 
+#include <random>
 #include <iomanip>
 #include <iostream>
 #include <fstream>
@@ -30,7 +31,6 @@
 
 #include <omp.h>
 
-#define R_MAX 1<<16
 #include "Particle.hpp"
 
 class GSimulation 

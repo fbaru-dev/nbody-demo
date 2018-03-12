@@ -41,63 +41,56 @@ void GSimulation :: set_number_of_steps(int N)
   set_nsteps(N);
 }
 
-void GSimulation :: init_pos()  
+void GSimulation :: init_pos()
 {
-  int gen = 42; 
-  srand(gen);
-  real_type max = static_cast<real_type> ( R_MAX );
-  
+  std::random_device rd;        //random number generator
+  std::mt19937 gen(42);
+  std::uniform_real_distribution<real_type> unif_d(0,1.0);
+
   for(int i=0; i<get_npart(); ++i)
   {
-    real_type r = static_cast<real_type>(rand()) / static_cast<real_type>(RAND_MAX); 
-    r = (max - 1.0f) * r + 1.0f;
-    particles->pos_x[i] = -1.0f + 2.0f * r / max; 
-    particles->pos_y[i] = -1.0f + 2.0f * r / max;  
-    particles->pos_z[i] = -1.0f + 2.0f * r / max;     
+    particles->pos_x[i] = unif_d(gen);
+    particles->pos_y[i] = unif_d(gen);
+    particles->pos_z[i] = unif_d(gen);
   }
 }
 
-void GSimulation :: init_vel()  
+void GSimulation :: init_vel()
 {
-  int gen = 42;
-  srand(gen);
-  real_type max = static_cast<real_type> (RAND_MAX);
+  std::random_device rd;        //random number generator
+  std::mt19937 gen(42);
+  std::uniform_real_distribution<real_type> unif_d(-1.0,1.0);
 
   for(int i=0; i<get_npart(); ++i)
   {
-    real_type r = static_cast<real_type>(rand()) / static_cast<real_type>(RAND_MAX); 
-    r = (max - 1.0f) * r + 1.0f;
-    particles->vel_x[i] = -1.0e-4f + 2.0f * r / max * 1.0e-4f;  
-    particles->vel_y[i] = -1.0e-4f + 2.0f * r / max * 1.0e-4f; 
-    particles->vel_z[i] = -1.0e-4f + 2.0f * r / max * 1.0e-4f; 
+    particles->vel_x[i] = unif_d(gen) * 1.0e-3f;
+    particles->vel_y[i] = unif_d(gen) * 1.0e-3f;
+    particles->vel_z[i] = unif_d(gen) * 1.0e-3f;
   }
 }
 
-void GSimulation :: init_acc() 
+void GSimulation :: init_acc()
 {
   for(int i=0; i<get_npart(); ++i)
   {
-    particles->acc_x[i] = 0.f; 
+    particles->acc_x[i] = 0.f;
     particles->acc_y[i] = 0.f;
     particles->acc_z[i] = 0.f;
   }
 }
 
-void GSimulation :: init_mass() 
+void GSimulation :: init_mass()
 {
-  int gen = 42;
-  srand(gen);
   real_type n   = static_cast<real_type> (get_npart());
-  real_type max = static_cast<real_type> (RAND_MAX);
+  std::random_device rd;        //random number generator
+  std::mt19937 gen(42);
+  std::uniform_real_distribution<real_type> unif_d(0.0,1.0);
 
   for(int i=0; i<get_npart(); ++i)
   {
-    real_type r = static_cast<real_type>(rand()) / static_cast<real_type>(RAND_MAX); 
-    r = (max - 1.0f) * r + 1.0f;
-    particles->mass[i] =  n + n * r / max; 
+    particles->mass[i] = n * unif_d(gen);
   }
 }
-
 
 void GSimulation :: start() 
 {
