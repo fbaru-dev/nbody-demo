@@ -1,5 +1,5 @@
 CXX = icpc
-COMPFLAGS = -g -std=c++17 -O2
+COMPFLAGS =  -g -std=c++11 -O2
  
 INCLUDES = 
 
