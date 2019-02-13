@@ -25,10 +25,10 @@ GSimulation :: GSimulation()
 {
   std::cout << "===============================" << std::endl;
   std::cout << " Initialize Gravity Simulation" << std::endl;
-  set_npart(2000); 
-  set_nsteps(500);
+  set_npart(16000); 
+  set_nsteps(10);
   set_tstep(0.1); 
-  set_sfreq(50);
+  set_sfreq(1);
 }
 
 void GSimulation :: set_number_of_particles(int N)  
@@ -100,7 +100,7 @@ void GSimulation :: start()
   int n = get_npart();
   int i,j;
  
-  const int alignment = 32;
+  const int alignment = 64;
   particles = (ParticleSoA*) _mm_malloc(sizeof(ParticleSoA),alignment);
 
   particles->pos_x = (real_type*) _mm_malloc(n*sizeof(real_type),alignment);
@@ -141,7 +141,6 @@ void GSimulation :: start()
 #pragma omp parallel for 
    for (i = 0; i < n; i++)// update acceleration
    {
-#ifdef ASALIGN
      __assume_aligned(particles->pos_x, alignment);
      __assume_aligned(particles->pos_y, alignment);
      __assume_aligned(particles->pos_z, alignment);
@@ -149,11 +148,11 @@ void GSimulation :: start()
      __assume_aligned(particles->acc_y, alignment);
      __assume_aligned(particles->acc_z, alignment);
      __assume_aligned(particles->mass, alignment);
-#endif
+     
      real_type ax_i = particles->acc_x[i];
      real_type ay_i = particles->acc_y[i];
      real_type az_i = particles->acc_z[i];
-#pragma omp simd reduction(+:ax_i,ay_i,az_i)
+     
      for (j = 0; j < n; j++)
      {
          real_type dx, dy, dz;
@@ -167,7 +166,7 @@ void GSimulation :: start()
  	 distanceSqr = dx*dx + dy*dy + dz*dz + softeningSquared;	//6flops
  	 distanceInv = 1.0f / sqrtf(distanceSqr);			//1div+1sqrt
 
-	 ax_i+= dx * G * particles->mass[j] * distanceInv * distanceInv * distanceInv; //6flops
+	 ax_i += dx * G * particles->mass[j] * distanceInv * distanceInv * distanceInv; //6flops
 	 ay_i += dy * G * particles->mass[j] * distanceInv * distanceInv * distanceInv; //6flops
 	 az_i += dz * G * particles->mass[j] * distanceInv * distanceInv * distanceInv; //6flops
      }

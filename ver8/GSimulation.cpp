@@ -25,10 +25,10 @@ GSimulation :: GSimulation()
 {
   std::cout << "===============================" << std::endl;
   std::cout << " Initialize Gravity Simulation" << std::endl;
-  set_npart(2000); 
-  set_nsteps(500);
+  set_npart(16000); 
+  set_nsteps(10);
   set_tstep(0.1); 
-  set_sfreq(50);
+  set_sfreq(1);
 }
 
 void GSimulation :: set_number_of_particles(int N)  
@@ -99,7 +99,7 @@ void GSimulation :: start()
   int n = get_npart();
   int i,j;
   
-  const int alignment = 32;
+  const int alignment = 64;
   particles = (ParticleSoA*) _mm_malloc(sizeof(ParticleSoA),alignment);
 
   particles->pos_x = (real_type*) _mm_malloc(n*sizeof(real_type),alignment);
@@ -145,7 +145,7 @@ void GSimulation :: start()
      real_type acc_xtile[tileSize];
      real_type acc_ytile[tileSize] ;
      real_type acc_ztile[tileSize];
-     #pragma omp simd
+#pragma omp simd
      for(int s=0; s<tileSize; s++)
      {
        acc_xtile[s] = 0.0f;
@@ -163,7 +163,7 @@ void GSimulation :: start()
      real_type ax_i = particles->acc_x[i];
      real_type ay_i = particles->acc_y[i];
      real_type az_i = particles->acc_z[i];
-     #pragma omp simd
+#pragma omp simd
      for (j = 0; j < n; j++)
      {
       for (int i = ii; i < ii + tileSize; i++)
@@ -184,7 +184,7 @@ void GSimulation :: start()
 	acc_ztile[i-ii] += dz * G * particles->mass[j] * distanceInv * distanceInv * distanceInv; //6flops
         }
      }
-     #pragma omp simd
+#pragma omp simd
      for(int s=0; s<tileSize; s++)
      {
        particles->acc_x[s+ii] = acc_xtile[s];

@@ -41,12 +41,12 @@ void GSimulation :: set_number_of_steps(int N)
   set_nsteps(N);
 }
 
-void GSimulation :: init_pos()
+void GSimulation :: init_pos()  
 {
-  std::random_device rd;        //random number generator
-  std::mt19937 gen(42);
+  std::random_device rd;	//random number generator
+  std::mt19937 gen(42);      
   std::uniform_real_distribution<real_type> unif_d(0,1.0);
-
+  
   for(int i=0; i<get_npart(); ++i)
   {
     particles->pos_x[i] = unif_d(gen);
@@ -55,7 +55,7 @@ void GSimulation :: init_pos()
   }
 }
 
-void GSimulation :: init_vel()
+void GSimulation :: init_vel()  
 {
   std::random_device rd;        //random number generator
   std::mt19937 gen(42);
@@ -65,21 +65,21 @@ void GSimulation :: init_vel()
   {
     particles->vel_x[i] = unif_d(gen) * 1.0e-3f;
     particles->vel_y[i] = unif_d(gen) * 1.0e-3f;
-    particles->vel_z[i] = unif_d(gen) * 1.0e-3f;
+    particles->vel_z[i] = unif_d(gen) * 1.0e-3f; 
   }
 }
 
-void GSimulation :: init_acc()
+void GSimulation :: init_acc() 
 {
   for(int i=0; i<get_npart(); ++i)
   {
-    particles->acc_x[i] = 0.f;
+    particles->acc_x[i] = 0.f; 
     particles->acc_y[i] = 0.f;
     particles->acc_z[i] = 0.f;
   }
 }
 
-void GSimulation :: init_mass()
+void GSimulation :: init_mass() 
 {
   real_type n   = static_cast<real_type> (get_npart());
   std::random_device rd;        //random number generator
@@ -88,7 +88,7 @@ void GSimulation :: init_mass()
 
   for(int i=0; i<get_npart(); ++i)
   {
-    particles->mass[i] = n * unif_d(gen);
+    particles->mass[i] = n * unif_d(gen); 
   }
 }
 
@@ -98,21 +98,21 @@ void GSimulation :: start()
   real_type dt = get_tstep();
   int n = get_npart();
   int i,j;
- 
-  const int alignment = 64;
-  particles = (ParticleSoA*) _mm_malloc(sizeof(ParticleSoA),alignment);
+  
+  //allocate particles
+  particles = new ParticleSoA;
+  
+  particles->pos_x = new real_type[n];
+  particles->pos_y = new real_type[n];
+  particles->pos_z = new real_type[n];
+  particles->vel_x = new real_type[n];
+  particles->vel_y = new real_type[n];
+  particles->vel_z = new real_type[n];
+  particles->acc_x = new real_type[n];
+  particles->acc_y = new real_type[n];
+  particles->acc_z = new real_type[n];
+  particles->mass  = new real_type[n]; 
 
-  particles->pos_x = (real_type*) _mm_malloc(n*sizeof(real_type),alignment);
-  particles->pos_y = (real_type*) _mm_malloc(n*sizeof(real_type),alignment);
-  particles->pos_z = (real_type*) _mm_malloc(n*sizeof(real_type),alignment);
-  particles->vel_x = (real_type*) _mm_malloc(n*sizeof(real_type),alignment);
-  particles->vel_y = (real_type*) _mm_malloc(n*sizeof(real_type),alignment);
-  particles->vel_z = (real_type*) _mm_malloc(n*sizeof(real_type),alignment);
-  particles->acc_x = (real_type*) _mm_malloc(n*sizeof(real_type),alignment);
-  particles->acc_y = (real_type*) _mm_malloc(n*sizeof(real_type),alignment);
-  particles->acc_z = (real_type*) _mm_malloc(n*sizeof(real_type),alignment);
-  particles->mass  = (real_type*) _mm_malloc(n*sizeof(real_type),alignment);
- 
   init_pos();	
   init_vel();
   init_acc();
@@ -121,8 +121,8 @@ void GSimulation :: start()
   print_header();
   
   _totTime = 0.; 
- 
-  const float softeningSquared = 1.e-3f;
+  
+  const float softeningSquared = 1e-3f;
   const float G = 6.67259e-11f;
   
   CPUTime time;
@@ -139,14 +139,6 @@ void GSimulation :: start()
    ts0 += time.start(); 
    for (i = 0; i < n; i++)// update acceleration
    {
-     __assume_aligned(particles->pos_x, alignment);
-     __assume_aligned(particles->pos_y, alignment);
-     __assume_aligned(particles->pos_z, alignment);
-     __assume_aligned(particles->acc_x, alignment);
-     __assume_aligned(particles->acc_y, alignment);
-     __assume_aligned(particles->acc_z, alignment);
-     __assume_aligned(particles->mass, alignment);
-
      real_type ax_i = particles->acc_x[i];
      real_type ay_i = particles->acc_y[i];
      real_type az_i = particles->acc_z[i];
@@ -164,7 +156,7 @@ void GSimulation :: start()
  	 distanceInv = 1.0f / sqrtf(distanceSqr);			//1div+1sqrt
 
 	 ax_i += dx * G * particles->mass[j] * distanceInv * distanceInv * distanceInv; //6flops
-	 ay_i  += dy * G * particles->mass[j] * distanceInv * distanceInv * distanceInv; //6flops
+	 ay_i += dy * G * particles->mass[j] * distanceInv * distanceInv * distanceInv; //6flops
 	 az_i += dz * G * particles->mass[j] * distanceInv * distanceInv * distanceInv; //6flops
      }
      particles->acc_x[i] = ax_i;
@@ -258,16 +250,15 @@ void GSimulation :: print_header()
 
 GSimulation :: ~GSimulation()
 {
-  _mm_free(particles->pos_x);
-  _mm_free(particles->pos_y);
-  _mm_free(particles->pos_z);
-  _mm_free(particles->vel_x);
-  _mm_free(particles->vel_y);
-  _mm_free(particles->vel_z);
-  _mm_free(particles->acc_x);
-  _mm_free(particles->acc_y);
-  _mm_free(particles->acc_z);
-  _mm_free(particles->mass);
-  _mm_free(particles);
-
+  delete [] particles->pos_x;
+  delete [] particles->pos_y;
+  delete [] particles->pos_z;
+  delete [] particles->vel_x;
+  delete [] particles->vel_y;
+  delete [] particles->vel_z;
+  delete [] particles->acc_x;
+  delete [] particles->acc_y;
+  delete [] particles->acc_z;
+  delete [] particles->mass;
+  delete particles;
 }

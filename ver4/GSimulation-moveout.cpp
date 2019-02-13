@@ -25,10 +25,10 @@ GSimulation :: GSimulation()
 {
   std::cout << "===============================" << std::endl;
   std::cout << " Initialize Gravity Simulation" << std::endl;
-  set_npart(2000); 
-  set_nsteps(500);
+  set_npart(16000); 
+  set_nsteps(10);
   set_tstep(0.1); 
-  set_sfreq(50);
+  set_sfreq(1);
 }
 
 void GSimulation :: set_number_of_particles(int N)  
@@ -41,12 +41,12 @@ void GSimulation :: set_number_of_steps(int N)
   set_nsteps(N);
 }
 
-void GSimulation :: init_pos()  
+void GSimulation :: init_pos()
 {
-  std::random_device rd;	//random number generator
-  std::mt19937 gen(42);      
+  std::random_device rd;        //random number generator
+  std::mt19937 gen(42);
   std::uniform_real_distribution<real_type> unif_d(0,1.0);
-  
+
   for(int i=0; i<get_npart(); ++i)
   {
     particles->pos_x[i] = unif_d(gen);
@@ -55,7 +55,7 @@ void GSimulation :: init_pos()
   }
 }
 
-void GSimulation :: init_vel()  
+void GSimulation :: init_vel()
 {
   std::random_device rd;        //random number generator
   std::mt19937 gen(42);
@@ -65,21 +65,21 @@ void GSimulation :: init_vel()
   {
     particles->vel_x[i] = unif_d(gen) * 1.0e-3f;
     particles->vel_y[i] = unif_d(gen) * 1.0e-3f;
-    particles->vel_z[i] = unif_d(gen) * 1.0e-3f; 
+    particles->vel_z[i] = unif_d(gen) * 1.0e-3f;
   }
 }
 
-void GSimulation :: init_acc() 
+void GSimulation :: init_acc()
 {
   for(int i=0; i<get_npart(); ++i)
   {
-    particles->acc_x[i] = 0.f; 
+    particles->acc_x[i] = 0.f;
     particles->acc_y[i] = 0.f;
     particles->acc_z[i] = 0.f;
   }
 }
 
-void GSimulation :: init_mass() 
+void GSimulation :: init_mass()
 {
   real_type n   = static_cast<real_type> (get_npart());
   std::random_device rd;        //random number generator
@@ -88,7 +88,7 @@ void GSimulation :: init_mass()
 
   for(int i=0; i<get_npart(); ++i)
   {
-    particles->mass[i] = n * unif_d(gen); 
+    particles->mass[i] = n * unif_d(gen);
   }
 }
 
@@ -122,7 +122,7 @@ void GSimulation :: start()
   
   _totTime = 0.; 
   
-  const float softeningSquared = 1e-3f;
+  const float softeningSquared = 1.e-3f;
   const float G = 6.67259e-11f;
   
   CPUTime time;
@@ -142,9 +142,6 @@ void GSimulation :: start()
      real_type ax_i = particles->acc_x[i];
      real_type ay_i = particles->acc_y[i];
      real_type az_i = particles->acc_z[i];
-#ifdef SIMD
-#pragma omp simd reduction(+:ax_i,ay_i,az_i)
-#endif
      for (j = 0; j < n; j++)
      {
          real_type dx, dy, dz;
@@ -158,7 +155,7 @@ void GSimulation :: start()
  	 distanceSqr = dx*dx + dy*dy + dz*dz + softeningSquared;	//6flops
  	 distanceInv = 1.0f / sqrtf(distanceSqr);			//1div+1sqrt
 
-	 ax_i+= dx * G * particles->mass[j] * distanceInv * distanceInv * distanceInv; //6flops
+	 ax_i += dx * G * particles->mass[j] * distanceInv * distanceInv * distanceInv; //6flops
 	 ay_i += dy * G * particles->mass[j] * distanceInv * distanceInv * distanceInv; //6flops
 	 az_i += dz * G * particles->mass[j] * distanceInv * distanceInv * distanceInv; //6flops
      }

@@ -25,10 +25,10 @@ GSimulation :: GSimulation()
 {
   std::cout << "===============================" << std::endl;
   std::cout << " Initialize Gravity Simulation" << std::endl;
-  set_npart(2000); 
-  set_nsteps(500);
+  set_npart(16000); 
+  set_nsteps(10);
   set_tstep(0.1); 
-  set_sfreq(50);
+  set_sfreq(1);
 }
 
 void GSimulation :: set_number_of_particles(int N)  

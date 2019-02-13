@@ -25,10 +25,10 @@ GSimulation :: GSimulation()
 {
   std::cout << "===============================" << std::endl;
   std::cout << " Initialize Gravity Simulation" << std::endl;
-  set_npart(2000); 
-  set_nsteps(500);
+  set_npart(16000); 
+  set_nsteps(10);
   set_tstep(0.1); 
-  set_sfreq(50);
+  set_sfreq(1);
 }
 
 void GSimulation :: set_number_of_particles(int N)  
@@ -140,7 +140,7 @@ void GSimulation :: start()
 	  dz = particles[j].pos[2] - particles[i].pos[2];	//1flop
 	
 	  distanceSqr = dx*dx + dy*dy + dz*dz + softeningSquared;	//6flops
-	  distanceInv = 1.0f / sqrtf(distanceSqr);			//1div+1sqrt
+	  distanceInv = 1.0 / sqrt(distanceSqr);			//1div+1sqrt
 		  
 	  particles[i].acc[0] += dx * G * particles[j].mass * distanceInv * distanceInv * distanceInv;	//6flops
 	  particles[i].acc[1] += dy * G * particles[j].mass * distanceInv * distanceInv * distanceInv;	//6flops

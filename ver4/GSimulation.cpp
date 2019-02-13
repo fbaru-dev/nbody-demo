@@ -25,10 +25,10 @@ GSimulation :: GSimulation()
 {
   std::cout << "===============================" << std::endl;
   std::cout << " Initialize Gravity Simulation" << std::endl;
-  set_npart(2000); 
-  set_nsteps(500);
+  set_npart(16000); 
+  set_nsteps(10);
   set_tstep(0.1); 
-  set_sfreq(50);
+  set_sfreq(1);
 }
 
 void GSimulation :: set_number_of_particles(int N)  
@@ -137,15 +137,10 @@ void GSimulation :: start()
   for (int s=1; s<=get_nsteps(); ++s)
   {   
    ts0 += time.start(); 
-   for (i = 0; i < n; i++)// update acceleration
+   for (j = 0; j < n; j++)// update acceleration
    {
-     real_type ax_i = particles->acc_x[i];
-     real_type ay_i = particles->acc_y[i];
-     real_type az_i = particles->acc_z[i];
-#ifdef SIMD
-#pragma omp simd reduction(+:ax_i,ay_i,az_i)
-#endif
-     for (j = 0; j < n; j++)
+#pragma omp simd   
+    for (i = 0; i < n; i++)
      {
          real_type dx, dy, dz;
 	 real_type distanceSqr = 0.0f;
@@ -158,13 +153,10 @@ void GSimulation :: start()
  	 distanceSqr = dx*dx + dy*dy + dz*dz + softeningSquared;	//6flops
  	 distanceInv = 1.0f / sqrtf(distanceSqr);			//1div+1sqrt
 
-	 ax_i+= dx * G * particles->mass[j] * distanceInv * distanceInv * distanceInv; //6flops
-	 ay_i += dy * G * particles->mass[j] * distanceInv * distanceInv * distanceInv; //6flops
-	 az_i += dz * G * particles->mass[j] * distanceInv * distanceInv * distanceInv; //6flops
+	 particles->acc_x[i] += dx * G * particles->mass[j] * distanceInv * distanceInv * distanceInv; //6flops
+	 particles->acc_y[i] += dy * G * particles->mass[j] * distanceInv * distanceInv * distanceInv; //6flops
+	 particles->acc_z[i] += dz * G * particles->mass[j] * distanceInv * distanceInv * distanceInv; //6flops
      }
-     particles->acc_x[i] = ax_i;
-     particles->acc_y[i] = ay_i;
-     particles->acc_z[i] = az_i;
    }
    energy = 0;
 
