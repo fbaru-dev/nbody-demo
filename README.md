@@ -32,28 +32,30 @@ To start the demo, go to the folder `ver0`, compile and run the test.
 ### Intial version: ver0
 The typical output of the simulation is:
 ```
-Run the default test case on CPU: 
- ./nbody.x 
- ===============================
-  Initialize Gravity Simulation
-  nPart = 2000; nSteps = 500; dt = 0.1
- ------------------------------------------------
-  s       dt      kenergy     time (s)    GFlops      
- ------------------------------------------------
-   50      5      103.29      1.5109      3.84        
-  100     10      389.23      1.3833      4.1941      
-  150     15      461.36      1.3327      4.3534      
-  200     20      902.23      1.4129      4.1064      
-  250     25      959.14      1.4233      4.0764      
-  300     30      1042.5      1.5151      3.8293      
-  350     35      1438        1.4837      3.9103      
-  400     40      1567.5      1.306       4.4424      
-  450     45      2000        1.419       4.0888      
-  500     50      2666.5      1.3435      4.3184         
+Run the default test case on CPU:
+./nbody.x
+===============================
+ Initialize Gravity Simulation
+ nPart = 16000; nSteps = 10; dt = 0.1
+------------------------------------------------
+ s       dt      kenergy     time (s)    GFlops
+------------------------------------------------
+ 1       0.1     26.405      1.7966      4.1324
+ 2       0.2     313.77      1.5309      4.8498
+ 3       0.3     926.56      1.5311      4.8489
+ 4       0.4     1866.4      1.5313      4.8484
+ 5       0.5     3135.6      1.5315      4.8479
+ 6       0.6     4737.6      1.5309      4.8497
+ 7       0.7     6676.6      1.5312      4.8487
+ 8       0.8     8957.7      1.5311      4.849
+ 9       0.9     11587       1.5314      4.848
+ 10      1       14572       1.5309      4.8495
 
- # Number Threads     : 1
- # Total Time (s)     : 14.466
- # Average Perfomance : 4.0513 +- 0.11807
+# Number Threads     : 1
+# Total Time (s)     : 15.577
+# Average Perfomance : 4.8488 +- 0.00062286
+===============================
+
 ```
 
 On output is printed some useful information. Colomnwise: s is the
