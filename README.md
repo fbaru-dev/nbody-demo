@@ -186,4 +186,4 @@ openmp scheduling and threads affinity.
 ### ver8
 This is the version of the code with OpenMP and cache tiling.
 One can also play with the floating point model -fp-model fast=2, for example and
-look for further performance improvements
+look for further performance improvements.
